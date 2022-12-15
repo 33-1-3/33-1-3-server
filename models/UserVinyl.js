@@ -6,19 +6,15 @@ const infoSchema = new Schema({
   state: { type: String },
 });
 
-const dateSchema = new Schema(
+const userVinylSchema = new Schema(
   {
-    collectionId: { type: Number, required: true },
-    uDate: { type: Date },
+    // _id = userVinylId
+    releasedId: { type: Number, required: true },
+    userId: { type: Number, required: true },
+    info: [infoSchema],
+    memo: { type: String },
   },
-  { timestamps: { createdAt: 'rDate', updatedAt: false } }
+  { timestamps: { createdAt: false, updatedAt: 'uDate' } }
 );
 
-const vinylSchema = new Schema({
-  releasedId: { type: Number, required: true },
-  info: [infoSchema],
-  memo: { type: String },
-  dates: [dateSchema],
-});
-
-module.exports = model('Vinyl', vinylSchema);
+module.exports = model('UserVinyl', userVinylSchema);
