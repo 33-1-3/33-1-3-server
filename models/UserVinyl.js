@@ -9,8 +9,8 @@ const infoSchema = new Schema({
 const userVinylSchema = new Schema(
   {
     // _id = userVinylId
-    releasedId: { type: Number, required: true },
     userId: { type: Number, required: true },
+    releasedId: { type: Number, required: true },
     info: [infoSchema],
     memo: { type: String },
   },
