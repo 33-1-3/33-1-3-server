@@ -1,10 +1,22 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const cors = require('cors');
 
 dotenv.config();
 
 const app = express();
+
+const safesitelist = ['http://localhost:3000', 'https://33-1-3.com/'];
+const corsOptions = {
+  origin(origin, callback) {
+    const issafesitelisted = safesitelist.indexOf(origin) !== -1;
+    callback(null, issafesitelisted);
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // mongoose 연결 확인
@@ -83,10 +95,13 @@ app.get('/collections/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     const targetCollection = await Collection.find({ userId });
-    const response = targetCollection.map(({ title, _id: collectionId }) => ({
-      title,
-      collectionId,
-    }));
+    const response = targetCollection.map(
+      ({ title, _id: collectionId, vinyls }) => ({
+        title,
+        collectionId,
+        vinylCount: vinyls.length,
+      })
+    );
     res.send(response);
   } catch (err) {
     console.log(err);
@@ -137,12 +152,13 @@ app.get('/collection/:collectionId', async (req, res) => {
   try {
     const { collectionId } = req.params;
     const targetCollection = await Collection.findOne({ _id: collectionId });
+    const { title: collectionTitle } = targetCollection;
     const targetVinyls = targetCollection.vinyls.map(
       ({ releasedId }) => releasedId
     );
-    const vinylsInfo = await CommonVinyl.find({ _id: { $in: targetVinyls } });
-    const response = vinylsInfo.map(
-      ({ imgUrl, title, artist, genre, _id: released }) => ({
+    const _vinylsInfo = await CommonVinyl.find({ _id: { $in: targetVinyls } });
+    const vinylsInfo = _vinylsInfo.map(
+      ({ imgUrl, title, artist, genre, released }) => ({
         imgUrl,
         title,
         artist,
@@ -150,7 +166,7 @@ app.get('/collection/:collectionId', async (req, res) => {
         released,
       })
     );
-    res.send(response);
+    res.send({ collectionTitle, vinylsInfo });
   } catch (err) {
     console.log(err);
   }
