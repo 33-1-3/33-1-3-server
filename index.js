@@ -18,24 +18,7 @@ mongoose
   })
   .catch((error) => console.error(error));
 
-const Auth = require('./models/Auth');
-
-app.post('/test', async (req, res) => {
-  console.log(Auth);
-  try {
-    const auth = await new Auth(req.body);
-    console.log(auth._id);
-    await auth.save();
-    res.send('good');
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-
-const { Collection, UserVinyl, CommonVinyl } = require('./models');
-
-// 현정
+const { Auth, Collection, UserVinyl, CommonVinyl } = require('./models');
 
 // 로그인
 app.post('/signin', async (req, res) => {
@@ -70,13 +53,10 @@ app.post('/check', async (req, res) => {
 
     await user.save();
     res.send(user);
-      } catch (err) {
+  } catch (err) {
     return res.status(401).send({ error: 'error' });
   }
 });
-
-
-// 윤하
 
 // 아이템 추가 모달 렌더링
 app.get('/collections/:userId/:releasedId', async (req, res) => {
@@ -93,12 +73,10 @@ app.get('/collections/:userId/:releasedId', async (req, res) => {
     });
 
     res.send(response);
-
   } catch (err) {
     res.status(400).send(err);
   }
 });
-
 
 // 컬렉션 렌더링
 app.get('/collections/:userId', async (req, res) => {
@@ -120,7 +98,7 @@ app.post('/collections/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     const { title } = req.body;
-    const collection = await new Collection({ title, userId });
+    const collection = new Collection({ title, userId });
     await collection.save();
     res.send(collection.id);
   } catch (err) {
@@ -178,9 +156,6 @@ app.get('/collection/:collectionId', async (req, res) => {
   }
 });
 
-
-// 채린
-
 // Add Items 모달 내부 확인 버튼 클릭 시 -> 컬렉션에 vinyl 추가, 삭제 & 컬렉션 추가
 app.post('/vinyl/:userId', async (req, res) => {
   const { userId } = req.params;
@@ -230,7 +205,7 @@ app.post('/vinyl/:userId', async (req, res) => {
     }
 
     res.status(201).send();
-    } catch (err) {
+  } catch (err) {
     res.status(400).send(err);
   }
 });
