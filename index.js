@@ -1,12 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const nodemailer = require('nodemailer');
+const ejs = require('ejs');
+
 const cors = require('cors');
 
 dotenv.config();
 
 const app = express();
 
+// cors
 const safesitelist = ['http://localhost:3000', 'https://33-1-3.com/'];
 const corsOptions = {
   origin(origin, callback) {
@@ -42,10 +46,10 @@ app.post('/signin', async (req, res) => {
 
     const user = await Auth.findOne({ email, password });
 
-    if (!user) return res.status(401).send({ error: '가입해라' });
-
+    if (!user) return res.status(200).send({ state: 'notExist' });
+    if (user.auth === false) return res.status(200).send({ state: 'needAuth' });
     res.status(200).send({
-      email: user.email,
+      userId: user.id,
     });
   } catch (err) {
     return res.status(401).send(err);
@@ -53,18 +57,58 @@ app.post('/signin', async (req, res) => {
 });
 
 // 회원가입
-app.post('/check', async (req, res) => {
+app.post('/signup', async (req, res) => {
   try {
-    const ExistedUser = await Auth.findOne({ email: req.body.email });
+    const { email, nickname } = req.body;
+    const ExistedUser = await Auth.findOne({ email });
 
     if (ExistedUser) {
-      return res.status(401).send({ error: '이미 존재하는 이메일임' });
+      return res.send({ state: 'duplicate' });
     }
-
     const user = new Auth(req.body);
-
     await user.save();
-    res.send(user);
+    const userId = user.id;
+    // 이메일 전송
+
+    let emailTemplate;
+    ejs.renderFile(
+      './verification/emailTemplate.ejs',
+      { email, userId, nickname },
+      (err, data) => {
+        if (err) console.log(err);
+        emailTemplate = data;
+      }
+    );
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      port: 313,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD,
+      },
+    });
+
+    await transporter.sendMail({
+      from: `33-1-3 <${process.env.EMAIL}>`,
+      to: `${email}`,
+      subject: '[33-1-3] 이메일 인증',
+      html: emailTemplate,
+    });
+
+    res.send({ state: 'success' });
+  } catch (err) {
+    return res.status(401).send({ error: err });
+  }
+});
+
+// 이메일 인증
+app.post('/verification', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    await Auth.findOneAndUpdate({ _id: userId }, { $set: { auth: true } });
+    res.send('success');
   } catch (err) {
     return res.status(401).send({ error: 'error' });
   }
