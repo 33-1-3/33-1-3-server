@@ -7,6 +7,10 @@ const authSchema = new Schema(
     nickname: { type: String, required: true },
     password: { type: String, require: true },
     profileImage: { type: String, default: '' },
+    auth: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: { createdAt: 'rDate', updatedAt: 'uDate' } }
 );

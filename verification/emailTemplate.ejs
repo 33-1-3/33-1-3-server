@@ -1,0 +1,36 @@
+<html>
+
+<body>
+  <div style="margin-top: 3rem; display: block; width: 50rem; height: .3rem; background-color: #6c33e8;"></div>
+  <img style="margin: 3rem 0 1rem; width: 4.5rem;" src="http://localhost:3313/logo.svg" alt="33.3">
+
+  <div style="font-size:2rem; margin-bottom:2rem;">
+    <span style="font-size: 2rem; margin-bottom: 2rem; color: #6c33e8; font-weight: 900;">메일인증</span>
+    안내입니다.
+  </div>
+  <div style="margin-bottom: 1.5rem; line-height: 2rem;">
+    <span style="font-size: 1.1rem; font-weight: 900;">
+      <%= nickname %>
+    </span>
+    님, 반갑습니다!
+    <br>
+    33.3에 회원가입 해주셔서 감사합니다.
+    <br>
+    해당 메일은 <span style="font-size: 1.1rem; font-weight: 900; color: black; text-decoration:none; ">
+      <%= email %>
+    </span>이 정확한 이메일 주소인지 확인하는 메일입니다.
+    <br>
+    아래 <span style="font-size: 1.1rem; font-weight: 900;">"메일 인증"</span> 버튼을 클릭하여 회원가입을 완료해주세요.
+  </div>
+  <div style="width: 12.5rem; height: 3.25rem; margin-bottom: 2rem;">
+    <a class="verificationButton"
+      style="display: block; border-radius:1.5rem; font-size:1.25rem; font-weight:900; text-align:center; text-decoration:none; color:white; background-color:#6c33e8;"
+      href="http://localhost:3000/verification/<%= userId %>">
+      <div style="width: 12.5rem; height: 3.25rem; line-height: 3.25rem;">
+        메일 인증
+      </div>
+    </a>
+  </div>
+</body>
+
+</html>
