@@ -76,9 +76,7 @@ app.post('/signin', async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user.id },
       process.env.JWT_SECRET_KEY,
-      {
-        expiresIn: '1d',
-      }
+      { expiresIn: '1d' }
     );
 
     res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -89,9 +87,7 @@ app.post('/signin', async (req, res) => {
       secure: true,
     });
 
-    return res.status(200).send({
-      userId: user.id,
-    });
+    return res.status(200).send({ userId: user.id });
   } catch (error) {
     return res.status(401).send({ error });
   }
@@ -117,7 +113,7 @@ app.post('/signup', async (req, res) => {
     let emailTemplate;
     ejs.renderFile(
       './verification/emailTemplate.ejs',
-      { email, userId, nickname },
+      { server: process.env.WEB_SERVER, email, userId, nickname },
       (err, data) => {
         if (err) console.log(err);
         emailTemplate = data;
