@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const nodemailer = require('nodemailer');
 const ejs = require('ejs');
 const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 
 const cors = require('cors');
 
@@ -23,6 +25,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser());
 
 // mongoose 연결 확인
 mongoose
@@ -37,6 +40,26 @@ mongoose
 
 const { Auth, Collection, UserVinyl, CommonVinyl } = require('./models');
 
+// auth 요청
+app.get('/auth', (req, res) => {
+  const { accessToken } = req.cookies;
+
+  try {
+    const { userId } = jwt.verify(accessToken, process.env.JWT_SECRET_KEY);
+
+    res.send({ isLogin: true, userId });
+  } catch (error) {
+    res.send({ isLogin: false });
+  }
+});
+
+// 로그아웃
+app.get('/logout', (req, res) => {
+  res.clearCookie('accessToken');
+
+  res.end();
+});
+
 // 로그인
 app.post('/signin', async (req, res) => {
   try {
@@ -44,9 +67,28 @@ app.post('/signin', async (req, res) => {
 
     const user = await Auth.findOne({ email });
     if (!user) return res.status(200).send({ state: 'notExist' });
+
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) return res.status(200).send({ state: 'notExist' });
+
     if (user.auth === false) return res.status(200).send({ state: 'needAuth' });
+    console.log(user.id);
+    const accessToken = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: '1d',
+      }
+    );
+
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+    res.cookie('accessToken', accessToken, {
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7d
+      httpOnly: true,
+      secure: true,
+    });
+
     return res.status(200).send({
       userId: user.id,
     });
@@ -150,7 +192,7 @@ app.get('/collections/:userId', async (req, res) => {
     );
     return res.send(response);
   } catch (error) {
-    return res.status(400).send({ error });
+    return res.send([]);
   }
 });
 
