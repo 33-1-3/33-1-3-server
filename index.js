@@ -113,7 +113,7 @@ app.post('/signup', async (req, res) => {
     let emailTemplate;
     ejs.renderFile(
       './verification/emailTemplate.ejs',
-      { email, userId, nickname },
+      { server: process.env.WEB_SERVER, email, userId, nickname },
       (err, data) => {
         if (err) console.log(err);
         emailTemplate = data;
