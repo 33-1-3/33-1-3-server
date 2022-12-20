@@ -179,13 +179,17 @@ app.get('/collections/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     const targetCollection = await Collection.find({ userId });
-    const response = targetCollection.map(
-      ({ title, _id: collectionId, vinyls }) => ({
-        title,
-        collectionId,
-        vinylCount: vinyls.length,
-      })
-    );
+    const [auth] = await Auth.find({ _id: userId });
+    const response = {
+      collections: targetCollection.map(
+        ({ title, _id: collectionId, vinyls }) => ({
+          title,
+          collectionId,
+          vinylCount: vinyls.length,
+        })
+      ),
+      nickname: auth.nickname,
+    };
     return res.send(response);
   } catch (error) {
     return res.send([]);
