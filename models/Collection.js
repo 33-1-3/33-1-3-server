@@ -4,7 +4,7 @@ const vinylSchema = new Schema(
   {
     releasedId: { type: Number, required: true },
   },
-  { timestamps: { createdAt: 'rDate', updatedAt: false } },
+  { timestamps: { createdAt: 'rDate', updatedAt: false } }
 );
 
 const collectionSchema = new Schema(
@@ -12,9 +12,9 @@ const collectionSchema = new Schema(
     //  _id = collectionId
     title: { type: String, required: true },
     vinyls: [vinylSchema],
-    userId: { type: Number, required: true },
+    userId: { type: String, required: true },
   },
-  { timestamps: { createdAt: 'rDate', updatedAt: 'uDate' } },
+  { timestamps: { createdAt: 'rDate', updatedAt: 'uDate' } }
 );
 
 module.exports = model('Collection', collectionSchema);
