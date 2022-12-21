@@ -3,12 +3,13 @@ const { Schema, model } = require('mongoose');
 const commonVinylSchema = new Schema(
   {
     // _id = releasedId
-    _id: { type: Number, required: true },
+    _id: { type: String, required: true },
     imgUrl: { type: String, default: '' },
     title: { type: String, default: '' },
     artist: { type: String, default: '' },
-    released: { type: Number },
+    year: { type: String, default: '' },
     genre: [{ type: String }],
+    resourceUrl: { type: String, default: '' },
   },
   { timestamps: { createdAt: 'rDate', updatedAt: 'uDate' } }
 );

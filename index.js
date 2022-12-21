@@ -72,7 +72,6 @@ app.post('/signin', async (req, res) => {
     if (!validPassword) return res.status(200).send({ state: 'notExist' });
 
     if (user.auth === false) return res.status(200).send({ state: 'needAuth' });
-    console.log(user.id);
     const accessToken = jwt.sign(
       { userId: user.id },
       process.env.JWT_SECRET_KEY,
@@ -87,7 +86,7 @@ app.post('/signin', async (req, res) => {
       secure: true,
     });
 
-    return res.status(200).send({ userId: user.id });
+    return res.status(200).send({ userId: user.id, state: 'success' });
   } catch (error) {
     return res.status(401).send({ error });
   }
@@ -147,7 +146,7 @@ app.post('/signup', async (req, res) => {
 app.post('/verification', async (req, res) => {
   try {
     const { userId } = req.body;
-    await Auth.findOneAndUpdate({ _id: userId }, { $set: { auth: true } });
+    await Auth.findOneAndUpdate({ _id: userId }, { auth: true });
     return res.send('success');
   } catch (error) {
     return res.status(400).send({ error });
@@ -242,12 +241,14 @@ app.get('/collection/:collectionId', async (req, res) => {
     );
     const _vinylsInfo = await CommonVinyl.find({ _id: { $in: targetVinyls } });
     const vinylsInfo = _vinylsInfo.map(
-      ({ imgUrl, title, artist, genre, released }) => ({
+      ({ id, imgUrl, resourceUrl, title, artist, genre, year }) => ({
+        id,
         imgUrl,
+        resourceUrl,
         title,
         artist,
         genre,
-        released,
+        year,
       })
     );
     return res.send({ collectionTitle, vinylsInfo });
@@ -263,9 +264,10 @@ app.post('/vinyl/:userId', async (req, res) => {
     releasedId,
     selectedCollectionIds,
     imgUrl,
+    resourceUrl,
     title,
     artist,
-    released,
+    year,
     genre,
   } = req.body;
 
@@ -291,14 +293,15 @@ app.post('/vinyl/:userId', async (req, res) => {
       await newVinyl.save();
     }
 
-    const commonVinyl = await CommonVinyl.findOne({ _id: +releasedId });
+    const commonVinyl = await CommonVinyl.findOne({ _id: releasedId });
     if (!commonVinyl) {
       const newVinyl = new CommonVinyl({
-        _id: +releasedId,
+        _id: releasedId,
         imgUrl,
+        resourceUrl,
         title,
         artist,
-        released,
+        year,
         genre,
       });
       await newVinyl.save();
@@ -317,7 +320,7 @@ app.put('/userVinyl/:collectionId/:releasedId', async (req, res) => {
   try {
     const targetCollection = await Collection.findById(collectionId);
     const newVinyls = targetCollection.vinyls.filter(
-      (vinyls) => vinyls.releasedId !== +releasedId
+      (vinyls) => vinyls.releasedId !== releasedId
     );
     const updatedCollection = await Collection.findByIdAndUpdate(
       collectionId,
