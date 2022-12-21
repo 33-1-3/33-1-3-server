@@ -2,7 +2,7 @@ const { Schema, model } = require('mongoose');
 
 const vinylSchema = new Schema(
   {
-    releasedId: { type: Number, required: true },
+    releasedId: { type: String, required: true },
   },
   { timestamps: { createdAt: 'rDate', updatedAt: false } }
 );
