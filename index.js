@@ -159,12 +159,12 @@ app.get('/collections/:userId/:releasedId', async (req, res) => {
     const { userId, releasedId } = req.params;
     const collections = await Collection.find({ userId });
 
-    const response = collections.map(({ title, vinyls }) => {
+    const response = collections.map(({ id, title, vinyls }) => {
       const isChecked =
         vinyls.find(
-          ({ releasedId: _releasedId }) => _releasedId === +releasedId
+          ({ releasedId: _releasedId }) => _releasedId === releasedId
         ) !== undefined;
-      return { title, isChecked };
+      return { id, title, isChecked };
     });
 
     return res.send(response);
