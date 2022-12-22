@@ -24,7 +24,7 @@ const corsOptions = {
 };
 
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://api.33-1-3.com');
+  res.header('Access-Control-Allow-Origin', 'https://33-1-3.com');
   res.header('Access-Control-Allow-Headers', 'X-Requested-With');
   res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE');
   next();
