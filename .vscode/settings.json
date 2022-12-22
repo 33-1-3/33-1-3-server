@@ -1,6 +1,0 @@
-{
-  "htmlhint.options": {
-    "spec-char-escape": false,
-    "doctype-first": false
-  }
-}
