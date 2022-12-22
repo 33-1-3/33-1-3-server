@@ -266,7 +266,8 @@ app.post('/vinyl/:userId', async (req, res) => {
   const { userId } = req.params;
   const {
     releasedId,
-    selectedCollectionIds,
+    // selectedCollectionIds,
+    collectionList,
     imgUrl,
     resourceUrl,
     title,
@@ -276,6 +277,24 @@ app.post('/vinyl/:userId', async (req, res) => {
   } = req.body;
 
   try {
+    const newCollectionList = await Promise.all(
+      collectionList.map(async (collection) => {
+        if (collection.id === '') {
+          const newCollection = new Collection({
+            title: collection.title,
+            userId,
+          });
+          const { id } = await newCollection.save();
+          return { ...collection, id };
+        }
+        return collection;
+      })
+    );
+
+    const selectedCollectionIds = newCollectionList
+      .filter((collection) => collection.isChecked)
+      .map((collection) => collection.id);
+
     // TODO: 아래 두 요청 하나로 합칠 수 있는가?
     await Collection.updateMany(
       { userId, _id: { $in: selectedCollectionIds } },
