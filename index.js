@@ -14,7 +14,7 @@ dotenv.config();
 const app = express();
 
 // cors
-const safesitelist = ['http://localhost:3000', 'https://33-1-3.com/'];
+const safesitelist = ['http://localhost:3000', 'https://33-1-3.com'];
 const corsOptions = {
   origin(origin, callback) {
     const issafesitelisted = safesitelist.indexOf(origin) !== -1;
@@ -27,6 +27,7 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'https://33-1-3.com');
   res.header('Access-Control-Allow-Headers', 'X-Requested-With');
   res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE');
+  res.header('Access-Control-Allow-Credentials', true);
   next();
 });
 
