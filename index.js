@@ -165,7 +165,7 @@ app.post('/verification', async (req, res) => {
 app.get('/collections/:userId/:releasedId', async (req, res) => {
   try {
     const { userId, releasedId } = req.params;
-    const collections = await Collection.find({ userId });
+    const collections = await Collection.find({ userId }).sort({ rDate: -1 });
 
     const response = collections.map(({ id, title, vinyls }) => {
       const isChecked =
@@ -185,7 +185,9 @@ app.get('/collections/:userId/:releasedId', async (req, res) => {
 app.get('/collections/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const targetCollection = await Collection.find({ userId });
+    const targetCollection = await Collection.find({ userId }).sort({
+      rDate: -1,
+    });
     const [auth] = await Auth.find({ _id: userId });
     const response = {
       collections: targetCollection.map(
@@ -286,7 +288,7 @@ app.post('/vinyl/:userId', async (req, res) => {
 
   try {
     const newCollectionList = await Promise.all(
-      collectionList.map(async (collection) => {
+      collectionList.reverse().map(async (collection) => {
         if (collection.id === '') {
           const newCollection = new Collection({
             title: collection.title,
